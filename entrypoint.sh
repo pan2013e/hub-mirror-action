@@ -70,8 +70,8 @@ if [[ "$DST_TYPE" == "github" ]]; then
   DST_REPO_CREATE_API=https://api.github.com/$DST_CREATE_URL_SUFFIX
   DST_REPO_LIST_API=https://api.github.com/$DST_LIST_URL_SUFFIX
 elif [[ "$DST_TYPE" == "gitee" ]]; then
-  DST_REPO_CREATE_API=https://gitee.com/api/v5/$DST_CREATE_URL_SUFFIX
-  DST_REPO_LIST_API=https://gitee.com/api/v5/$DST_LIST_URL_SUFFIX
+  DST_REPO_CREATE_API=https://gitee.com/api/v5/user/repos
+  DST_REPO_LIST_API=https://gitee.com/api/v5/user/repos
 else
   echo "Unknown dst args, the `dst` should be `[github|gittee]/account`"
   exit 1
@@ -90,7 +90,7 @@ function cd_src_repo
 function add_remote_repo
 {
   # Auto create non-existing repo
-  has_repo=`curl $DST_REPO_LIST_API | jq '.[] | select(.full_name=="'$DST_ACCOUNT'/'$1'").name' | wc -l`
+  has_repo=`curl $DST_REPO_LIST_API?access_token=$2 | jq '.[] | select(.full_name=="'$DST_ACCOUNT'/'$1'").name' | wc -l`
   if [ $has_repo == 0 ]; then
     if [[ "$DST_TYPE" == "github" ]]; then
       curl -H "Authorization: token $2" --data '{"name":"'$1'"}' $DST_REPO_CREATE_API
